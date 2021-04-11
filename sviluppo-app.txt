@@ -1,0 +1,90 @@
+
+Passaggi sviluppo app:
+
+- creazione app react con comando npx create-app-react nomeapp
+
+- cd nomeapp e code . per aprirla in code
+
+- cancellazione file non utili (index.css, app.css, index.text.js ecc.) e comando npm start per avviare il server
+
+- installazione sass con comando npm install node-sass
+
+- creazione cartella styles in src e all'interno creazione file app.scss, poi import di app.scss nel component App.js (import "./styles/app.scss")
+
+- creazione files _song.scss e _player.scss nella cartella styles ed import in app.scss con @import "./player";
+
+- creazione cartella components in src e creazione all'interno files Player.js e Song.js, in entrambi i components fatto l'import di react, creazione
+  function nomecomponent () {} ed infine export default nomecomponent
+
+- importati i componenti (song, player) in App.js con import Player from "./components/Player";
+
+- installazione libreria fontawesome con i seguenti comandi npm i --save @fortawesome/fontawesome-svg-core, npm install --save @fortawesome/free-solid-svg-icons
+  e npm install --save @fortawesome/react-fontawesome
+
+- import in Player.js della libreria con import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"; import { faPlay, faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons"  
+
+- aggiunte icone per player e skip back e forward con icon={faPlay, faAngleRight ecc}
+
+- aggiunti stili iniziali dei componenti in _player.scss, _song.scss e App.scss
+
+- installazione del uuid (universal unique identifier) con il comando npm install uuid
+
+- creazione in src del file (components) util.js che contiene una funzione che ritorna un array di oggetti contenente in nostri dati, cioè le
+  songs che andremo ad implementare nel music player (con i valori: name, color, artist, cover, audio, id, active)
+
+- in App.js importazione dello state con import {useState} from react, importazione file util con importa data from "./util"  
+
+- sempre in App.js nella funzione App() creazione degli state per modifiche dati const [songs, setSongs] = useState(data()); const [currentSong, setCurrentSong] = useState(songs[0]). useState(data())
+  utilizza i "data" presi dal file util e useState(songs[0]) setta al caricamento del player la canzone in prima posizione (posizione 0) nell'array di oggetti data 
+
+- la function app() poi return nei componenti Song e Player le props passate currentSong={currentSong}  
+
+- nel component Song.js passo la props come parametro nella funzione "const Song = ({currentSong})" e poi in return in h1,h2,img le inserisco per mostrare il name,
+  l'artsit e l'img es: <img src={currentSong.cover} />
+
+- in Plyer.js component passo currentSong come paramentro nella function, faccio l'importo di useRef che mi servirà per fare riferimento alla specifica
+  canzone corrent, creo una constante audioRef alla quale assegno il metodo useRef() impostato su null. Nel tag audio assegno come ref la costante appena
+ creata ref={audioRef} e in src la props currentSong
+
+- Sempre nel component Player.js creo una funzione evento const playSongHandler = () => { audioRef.current.play()} che al click dell'icona play (onClick={playSongHandler}) farà partire la canzone corrente
+
+- Pe mettere in pausa la musica si utilizza sempre lo state quindi creo una costante in App.js [isPlaying, setIsPlaying] = useState(false), false perchè la 
+  canzone non è eseguita di default e passo le due proprietà nel component <player />
+
+- In player.js passo le props nella function Player e nella function playSongHandler faccio un if/else se audioRef.current.pause() altrimenti audioRef.current.play()
+  cioè se è in esecuzione metti in pausa altrimenti metti play; ma per funzionare devo cambiare anche lo stato da false a true e viceversa quindi aggiungo setIsPlaying(!isPlaying)
+
+- Per aggiornare il tempo della canzone (minuticorrenti, durata) uso sempre lo stato in Player.js e creo una constante [songInfo, setSongInfo] che sarà uguale ad un oggetto che conterrà currenTime e duration impostati
+  di default a null (poi verrano impostati su valore 0 perchè non posso essere null)
+
+- Creo quindi una funzione timeUpdateHandler e la passo al tag audio attraverso l'evento onTimeUpdate che parte ogni volta che i minuti della canzone avanzano. Nella funzione timeUpdateHandler posso
+  salvare in due constanti il valore dei minuti correnti e della durata con e.target.currenTime e e.target.duration e con setSongInfo aggiornare l'array songInfo con currenTime: current e duration: duration attraverso
+  l'utilizzo dello spread operator     
+
+- Ora voglio rendere visibile nel player i minuti in esecuzione della canzone e la durata, ma per formattare il tempo in maniera "user friendly" creo una funzione const getTime nella quale passo
+  come parametro time e mi ritornerà quasta operazione di formattazione  Math.floor(time / 60) + ":" + ("0" + Math.floor(time % 60)).slice(-2). Passo quindi la funzione getTime nei paragrafi
+  Start Time e Endtime con i valori songInfo.currenTime e songInfo.duration. Infine per farsi che il tempo della canzione sia visibile all'avvio dell'applicazione e non al click play della 
+  canzone passo nel tag audio un altro evento chiamato onLoadedMetadata che sarà uguale alla funzione timeUpdateHandler.
+
+- Per aggiornare l'input slider imposto min={0} max={songInfo.duration} e value={songInfo.currenTime}, per renderlo poi trascinabile creo un'altra funzione dragHandler e la passo all'input tramite
+  l'evento onChange. In questa funzione dove passo l'evento come parametro uso lo stato setSongInfo per aggiornare tramite lo spread operator l'array songInfo con currenTime: e.target.value. Infine per aggiornare
+  l'audio quando trascino l'input slider nella funzione dico anche audioRef.current.currenTime = e.target.value
+
+- per mostrare l'icona pausa quando una canzone è in esecuzione e non l'icona play (e viceversa) importa faPause di fontawesome e nel component FontAwesomeIcon in icon faccio un check
+  tramite l'operatore ternario dicendo icon={isPlaying ? faPause : faPlay}
+  
+- per creare la libreria di canzoni credo il component library, nella libreria ci saranno tutte le canzoni quindi per mostrarle creo un'latro component
+  chiamato librarysong, la struttura sarà molto simile al component song che quindi copio e lo incollo li. importo librarysong in library e library in app.js.
+  Deevo quindi passare la proprietà songs={songs} nel component library e in library.js passarlo nella funzione Library. per mostrare tutte le canzoni nella
+  libraria (che ho nel file util.js) e non una per una utilizzerò il metodo map e nel component librarysong non passerò pià la proprietà currentSong ma solo
+  soong (es: song.cover, song,artist)
+
+- creo un file _library.scss per stilizzare la libreria, importante fare l'import in app.scss
+
+- per selezionare una canzone dalla libreria ed esegurila devo prima passare la prop setCurrentSong al component Library, qui poi passarlo al component
+  librarysong ed in quest'ultimo creare un evento onClick che al click farà scattare la funzione songSelecthandler. in librarysong mi serviranno anche le props
+  songs e setCurrentSong che passo al component librarysong. Quindi nella funzione songSelecthandler
+
+
+
+   
